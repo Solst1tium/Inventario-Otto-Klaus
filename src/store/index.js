@@ -8,7 +8,8 @@ export default new Vuex.Store({
   state: {
     currentUser: undefined,
     toys: [],
-    toy: undefined
+    toy: undefined,
+    overlay: false
   },
   mutations: {
     SET_USER(state, user){
@@ -16,6 +17,15 @@ export default new Vuex.Store({
     },
     SET_TOYS(state, toys){
       state.toys = toys
+    },
+    SET_TOY(state, toy){
+      state.toy = toy
+    },
+    OVERLAY_TRUE(state){
+      state.overlay = true
+    },
+    OVERLAY_FALSE(state){
+      state.overlay = false
     }
   },
   actions: {
@@ -23,20 +33,21 @@ export default new Vuex.Store({
       commit('SET_USER', user)
     },
     setToys ({commit}){
+      commit('OVERLAY_TRUE')
       axios.get('https://us-central1-ottoklauss-5927c.cloudfunctions.net/toys/toys').then((response) =>{
         commit('SET_TOYS', response.data)
+        commit('OVERLAY_FALSE')
       })
     },
-
-    setToy({commit}, id){
+    setToy({commit}, id){//parametros van por url
       axios.get(`https://us-central1-ottoklauss-5927c.cloudfunctions.net/toys/toys/${id}`).then((response) =>{
-        commit('SET_TOYS', response.data)
+        commit('SET_TOY', response.data)
       })
-
     },
-    submitToy(){
-      
-
+    submitToy({dispatch}, toy){//crear juguete nuevo y ver los juguetes creados
+      axios.post('https://us-central1-ottoklauss-5927c.cloudfunctions.net/toys/toy/', toy).then(() => {
+        dispatch('setToys')
+      })
     }
   },
   modules: {

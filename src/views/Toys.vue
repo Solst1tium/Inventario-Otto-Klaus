@@ -5,7 +5,7 @@
       <v-text-field v-model="currentToy.data.name" label="Nombre juguete" required> </v-text-field>
       <v-text-field v-model="currentToy.data.stock" label="Stock" required></v-text-field>
       <v-text-field v-model="currentToy.data.price" label="Precio" required></v-text-field>
-      <v-btn  color="success" class="mr-4"> {{currentToy.id ? "Editar" : "Crear"}}</v-btn>
+      <v-btn @click="submitForm"  color="success" class="mr-4"> {{currentToy.id ? "Actualizar" : "Crear"}}</v-btn>
       <v-btn color="error" class="mr-4">Cancelar</v-btn>    
   </v-form>
   <v-divider></v-divider>
@@ -28,6 +28,9 @@
           <td>{{ toy.data.code }}</td>
         </tr>
       </tbody>
+      <v-overlay :value="overlay">
+        <v-progress-circular indeterminate size="64"></v-progress-circular>
+    </v-overlay>
     </template>
   </v-simple-table>
     </div>
@@ -49,27 +52,32 @@ export default {
     }
   },
   computed: {
-    ...mapState(['toys'])
+    ...mapState(['toys', 'overlay'])
   },
   methods: {
-    ...mapActions(['setToys']),
+    ...mapActions(['setToys', 'submitToy']),
+
+    submitForm(){
+      if(!this.currentToy.id){//si no tiene id crear un juguete nuevo
+          this.createToy()
+        }else{//si no, actualizar
+          this.updateToy()
+        }
+    },
     createToy(){
-        const toy = {
-        code: this.currentToy.data.code,
-        name: this.currentToy.data.name,
-        price: this.currentToy.data.price,
-        stock: this.currentToy.data.stock
-      }
+      const toy = this.currentToy.data  
       this.submitToy(toy)
-      this.cleanCurrentToy
+      this.cleanCurrentToy()
+      },
+      setCurrentToy(toy){
+          this.currentToy = toy
       },
       cleanCurrentToy() {
         this.currentToy.data.code = '',
         this.currentToy.data.name = '',
         this.currentToy.data.price = 0,
         this.currentToy.data.stock = 0
-    }
-      
+    }      
   },
   created() {
     this.setToys()    
