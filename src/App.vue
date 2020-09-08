@@ -22,9 +22,9 @@
       </div>
 
       <v-spacer></v-spacer>
-      <v-btn text to="/toys">Juguetes</v-btn>
       <v-btn text to="/">Home</v-btn>
-     
+      <v-btn v-if="currentUser" text to="/toys">Juguetes</v-btn>  
+      <v-btn v-if="currentUser" text  @click.prevent="logout">Logout</v-btn>       
     </v-app-bar>
     <v-main>
       <router-view></router-view>
@@ -34,17 +34,28 @@
 </template>
 
 <script>
-
+import firebase from 'firebase'
+import {mapState, mapActions} from 'vuex'
 
 export default {
   name: 'App',
 
-  components: {
-  
+  components: {  
   },
-
   data: () => ({
     //
   }),
+    computed: {
+    ...mapState(['currentUser'])
+  }, 
+  methods: {
+    ...mapActions(['setUser']),
+    logout(){
+    firebase.auth().signOut().then(() => {
+    this.$router.push('/')
+    this.setUser(undefined)
+      })
+    }
+  },
 };
 </script>
